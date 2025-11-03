@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mountain Tactical Institute - MTI</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    :root {
+      --font-size: 16px;
+      --background: #ffffff;
+      --foreground: oklch(0.145 0 0);
+      --card: #ffffff;
+      --card-foreground: oklch(0.145 0 0);
+      --popover: oklch(1 0 0);
+      --popover-foreground: oklch(0.145 0 0);
+      --primary: #030213;
+      --primary-foreground: oklch(1 0 0);
+      --secondary: oklch(0.95 0.0058 264.53);
+      --secondary-foreground: #030213;
+      --muted: #ececf0;
+      --muted-foreground: #717182;
+      --accent: #e9ebef;
+      --accent-foreground: #030213;
+      --destructive: #d4183d;
+      --destructive-foreground: #ffffff;
+      --border: rgba(0, 0, 0, 0.1);
+      --input: transparent;
+      --input-background: #f3f3f5;
+      --switch-background: #cbced4;
+      --font-weight-medium: 500;
+      --font-weight-normal: 400;
+      --ring: oklch(0.708 0 0);
+      --radius: 0.625rem;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Archivo Narrow', sans-serif;
+      background-color: #ffffff;
+      color: oklch(0.145 0 0);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    h1, h2, h3, h4 {
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    // Simple state management
+    let currentPage = 'home';
+
+    // Lucide Icons as SVG
+    const icons = {
+      menu: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>',
+      check: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+      calendar: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>',
+      clock: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+      barChart3: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>',
+      arrowRight: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>',
+      instagram: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>',
+      facebook: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>',
+      youtube: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><polygon points="10 15 15 12 10 9 10 15"/></svg>'
+    };
+
+    // Header Component
+    function Header() {
+      return `
+        <header class="fixed top-0 left-0 right-0 z-50 bg-white border-b" style="border-color: rgba(0, 0, 0, 0.1);">
+          <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-baseline gap-3">
+              <h1 class="tracking-tight" style="font-family: 'Archivo Narrow', sans-serif; font-size: 2rem; font-weight: 700; line-height: 1;">
+                MTI
+              </h1>
+              <span class="uppercase tracking-wider" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.625rem; font-weight: 400; letter-spacing: 0.1em;">
+                Mountain Tactical Institute
+              </span>
+            </div>
+            
+            <div class="flex items-center gap-8">
+              <button class="uppercase tracking-wider transition-opacity hover:opacity-60" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; font-weight: 400; letter-spacing: 0.1em; background: none; border: none; cursor: pointer; color: inherit;">
+                Login
+              </button>
+              <button class="hover:opacity-60 transition-opacity" style="background: none; border: none; cursor: pointer; padding: 0.5rem;">
+                ${icons.menu}
+              </button>
+            </div>
+          </div>
+        </header>
+      `;
+    }
+
+    // Footer Component
+    function Footer() {
+      return `
+        <footer class="bg-white border-t py-12" style="border-color: rgba(0, 0, 0, 0.1);">
+          <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+              <div>
+                <h3 class="uppercase tracking-wider mb-4" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.1em;">
+                  About MTI
+                </h3>
+                <ul class="space-y-2" style="list-style: none; padding: 0; margin: 0;">
+                  <li><a href="#" class="transition-opacity hover:opacity-60" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; text-decoration: none; color: inherit;">Our Story</a></li>
+                  <li><a href="#" class="transition-opacity hover:opacity-60" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; text-decoration: none; color: inherit;">Mission</a></li>
+                  <li><a href="#" class="transition-opacity hover:opacity-60" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; text-decoration: none; color: inherit;">Team</a></li>
+                </ul>
+              </div>
+              
+              <div>
+                <h3 class="uppercase tracking-wider mb-4" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.1em;">
+                  Programs
+                </h3>
+                <ul class="space-y-2" style="list-style: none; padding: 0; margin: 0;">
+                  <li><a href="#" class="transition-opacity hover:opacity-60" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; text-decoration: none; color: inherit;">Military/LE</a></li>
+                  <li><a href="#" class="transition-opacity hover:opacity-60" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; text-decoration: none; color: inherit;">Mountain</a></li>
+                  <li><a href="#" class="transition-opacity hover:opacity-60" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; text-decoration: none; color: inherit;">Wildland Fire</a></li>
+                  <li><a href="#" class="transition-opacity hover:opacity-60" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; text-decoration: none; color: inherit;">All Programs</a></li>
+                </ul>
+              </div>
+              
+              <div>
+                <h3 class="uppercase tracking-wider mb-4" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.1em;">
+                  Resources
+                </h3>
+                <ul class="space-y-2" style="list-style: none; padding: 0; margin: 0;">
+                  <li><a href="#" class="transition-opacity hover:opacity-60" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; text-decoration: none; color: inherit;">Blog</a></li>
+                  <li><a href="#" class="transition-opacity hover:opacity-60" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; text-decoration: none; color: inherit;">Research</a></li>
+                  <li><a href="#" class="transition-opacity hover:opacity-60" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; text-decoration: none; color: inherit;">FAQ</a></li>
+                </ul>
+              </div>
+              
+              <div>
+                <h3 class="uppercase tracking-wider mb-4" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.1em;">
+                  Connect
+                </h3>
+                <div class="flex gap-4">
+                  <a href="#" class="transition-opacity hover:opacity-60" style="width: 20px; height: 20px; display: inline-block;">
+                    ${icons.instagram}
+                  </a>
+                  <a href="#" class="transition-opacity hover:opacity-60" style="width: 20px; height: 20px; display: inline-block;">
+                    ${icons.facebook}
+                  </a>
+                  <a href="#" class="transition-opacity hover:opacity-60" style="width: 20px; height: 20px; display: inline-block;">
+                    ${icons.youtube}
+                  </a>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-12 pt-8" style="border-top: 1px solid rgba(0, 0, 0, 0.1);">
+              <p class="text-center" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.75rem; color: #717182; margin: 0;">
+                © 2025 Mountain Tactical Institute. All rights reserved.
+              </p>
+            </div>
+          </div>
+        </footer>
+      `;
+    }
+
+    // HomePage Component
+    function HomePage() {
+      return `
+        <div class="min-h-screen flex flex-col">
+          <!-- Hero Section -->
+          <section class="flex-1 flex flex-col items-center justify-center px-6 pb-32 pt-32">
+            <div class="max-w-4xl w-full mx-auto text-center" style="display: flex; flex-direction: column; gap: 2rem;">
+              <h1 
+                class="tracking-tight mx-auto"
+                style="font-family: 'Archivo Narrow', sans-serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 400; line-height: 1.2; max-width: 900px; margin: 0;"
+              >
+                Precision Fitness for Mountain & Tactical Athletes
+              </h1>
+              
+              <!-- Search Bar -->
+              <div class="max-w-3xl mx-auto" style="width: 100%;">
+                <div class="flex gap-0 bg-white overflow-hidden" style="border: 1px solid rgba(0, 0, 0, 0.2);">
+                  <input 
+                    type="text"
+                    placeholder="Enter Your Mission, Objective or Goal"
+                    class="flex-1 px-6 py-4"
+                    style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.95rem; border: none; outline: none; background: transparent;"
+                  />
+                  <button 
+                    class="bg-black text-white hover:bg-opacity-90 px-8 py-4 uppercase tracking-wider transition-all"
+                    style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; letter-spacing: 0.1em; border: none; cursor: pointer;"
+                  >
+                    Find Your Plan
+                  </button>
+                </div>
+                <p 
+                  class="mt-3 text-center"
+                  style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; color: #717182; margin-top: 0.75rem;"
+                >
+                  Examples: "SFAS", "14er", "Wildland Fire Season", "Law Enforcement Academy"
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Mountain Image Section -->
+          <section class="relative w-full overflow-hidden" style="height: 24rem;">
+            <img
+              src="https://images.unsplash.com/photo-1510134659073-54f147c0afc2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3VudGFpbiUyMHBlYWtzJTIwbW9ub2Nocm9tZXxlbnwxfHx8fDE3NjE5ODYxMjR8MA&ixlib=rb-4.1.0&q=80&w=1080"
+              alt="Mountain Range"
+              class="w-full h-full object-cover"
+              style="filter: grayscale(100%); width: 100%; height: 100%; object-fit: cover;"
+            />
+            <div class="absolute inset-0" style="background: linear-gradient(to top, white, transparent, transparent);"></div>
+          </section>
+
+          <!-- Featured Categories -->
+          <section class="py-20 px-6">
+            <div class="max-w-7xl mx-auto">
+              <h2 
+                class="text-center mb-12 uppercase tracking-wider"
+                style="font-family: 'Archivo Narrow', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: 0.15em; margin-bottom: 3rem;"
+              >
+                Training Programs By Profession
+              </h2>
+              
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                ${[
+                  {
+                    title: "Military / LE",
+                    description: "Selection courses, operational fitness, and specialized tactical athlete programming",
+                    image: "https://images.unsplash.com/photo-1578816693124-42a829c6ad1f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0YWN0aWNhbCUyMHNvbGRpZXIlMjBzaWxob3VldHRlfGVufDF8fHx8MTc2MTk4NjEyNHww&ixlib=rb-4.1.0&q=80&w=1080"
+                  },
+                  {
+                    title: "Mountain Athletes",
+                    description: "Alpine climbing, backcountry skiing, mountaineering, and high-altitude preparation",
+                    image: "https://images.unsplash.com/photo-1647899512527-4b7dd66f2b9a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3VudGFpbiUyMGNsaW1iaW5nJTIwcGVha3N8ZW58MXx8fHwxNzYxOTg2MTI1fDA&ixlib=rb-4.1.0&q=80&w=1080"
+                  },
+                  {
+                    title: "Wildland Fire",
+                    description: "Season prep, pack test training, and sustained operational readiness",
+                    image: "https://images.unsplash.com/photo-1729217844863-cb4a17f7f2a3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3aWxkZmlyZSUyMGZpcmVmaWdodGVyJTIwbGFuZHNjYXBlfGVufDF8fHx8MTc2MTk4NjEyNXww&ixlib=rb-4.1.0&q=80&w=1080"
+                  }
+                ].map(category => `
+                  <div class="group cursor-pointer">
+                    <div class="relative overflow-hidden mb-4 bg-black" style="aspect-ratio: 4/5; border: 1px solid rgba(0, 0, 0, 0.1);">
+                      <img
+                        src="${category.image}"
+                        alt="${category.title}"
+                        class="w-full h-full object-cover transition-opacity duration-300"
+                        style="filter: grayscale(100%); opacity: 0.8; width: 100%; height: 100%; object-fit: cover;"
+                        onmouseover="this.style.opacity='0.6'"
+                        onmouseout="this.style.opacity='0.8'"
+                      />
+                    </div>
+                    <h3 
+                      class="uppercase tracking-wider mb-2"
+                      style="font-family: 'Archivo Narrow', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: 0.1em; margin-bottom: 0.5rem;"
+                    >
+                      ${category.title}
+                    </h3>
+                    <p 
+                      style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.9rem; line-height: 1.6; color: #717182; margin: 0;"
+                    >
+                      ${category.description}
+                    </p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </section>
+
+          <!-- Philosophy Section -->
+          <section class="py-20 px-6 bg-black text-white">
+            <div class="max-w-4xl mx-auto text-center" style="display: flex; flex-direction: column; gap: 1.5rem;">
+              <h2 
+                class="uppercase tracking-wider"
+                style="font-family: 'Archivo Narrow', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: 0.15em; margin: 0;"
+              >
+                Mission-First Fitness
+              </h2>
+              <p 
+                class="max-w-2xl mx-auto"
+                style="font-family: 'Archivo Narrow', sans-serif; font-size: 1.125rem; line-height: 1.8; max-width: 42rem; margin: 0 auto;"
+              >
+                We build fitness programming for quiet professionals. No gimmicks. No hype. 
+                Just precision training designed for the demands of your mission—whether that's 
+                selection, a summit, or a fire season.
+              </p>
+              <button 
+                class="mt-6 border border-white text-white hover:bg-white hover:text-black uppercase tracking-wider transition-all"
+                style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; letter-spacing: 0.1em; background: transparent; padding: 0.5rem 1.5rem; cursor: pointer; margin-top: 1.5rem; display: inline-block; align-self: center; border-radius: 0.375rem;"
+              >
+                Learn More About MTI
+              </button>
+            </div>
+          </section>
+        </div>
+      `;
+    }
+
+    // ProductPage Component
+    function ProductPage() {
+      const stats = [
+        { icon: icons.calendar, label: "Duration", value: "8 Weeks" },
+        { icon: icons.clock, label: "Sessions/Week", value: "6 Days" },
+        { icon: icons.barChart3, label: "Level", value: "Advanced" },
+        { icon: icons.check, label: "Equipment", value: "Minimal" }
+      ];
+
+      const included = [
+        "8 weeks of daily programming with detailed session plans",
+        "Progressive rucking protocol (increasing weight and distance)",
+        "Strength and conditioning circuits focused on functional capacity",
+        "Endurance sessions designed for sustained output",
+        "Mental toughness training integrated throughout",
+        "Equipment substitution guide for limited access scenarios",
+        "Scaling options for different fitness levels"
+      ];
+
+      const planIncludes = [
+        "Immediate digital access",
+        "Mobile & desktop compatible",
+        "Printable daily sessions",
+        "Training log templates",
+        "Email support"
+      ];
+
+      return `
+        <div class="min-h-screen py-24">
+          <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+              <!-- Main Content -->
+              <div class="lg:col-span-2" style="display: flex; flex-direction: column; gap: 2rem;">
+                <!-- Breadcrumb -->
+                <div class="flex items-center gap-2" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; color: #717182;">
+                  <a href="#" class="hover:text-black transition-colors" style="text-decoration: none; color: inherit;">Programs</a>
+                  <span>/</span>
+                  <a href="#" class="hover:text-black transition-colors" style="text-decoration: none; color: inherit;">Military & LE</a>
+                  <span>/</span>
+                  <span class="text-black" style="color: black;">SFAS Training Plan</span>
+                </div>
+
+                <!-- Title & Meta -->
+                <div>
+                  <div class="flex flex-wrap gap-2 mb-4" style="margin-bottom: 1rem;">
+                    <span class="inline-flex items-center justify-center rounded-md border px-2 py-0.5 uppercase tracking-wider" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.75rem; letter-spacing: 0.1em; background-color: var(--secondary); border-color: transparent;">
+                      Military
+                    </span>
+                    <span class="inline-flex items-center justify-center rounded-md border px-2 py-0.5 uppercase tracking-wider" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.75rem; letter-spacing: 0.1em; background-color: var(--secondary); border-color: transparent;">
+                      Selection
+                    </span>
+                  </div>
+                  
+                  <h1 
+                    style="font-family: 'Archivo Narrow', sans-serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 600; line-height: 1.2; margin-bottom: 1rem;"
+                  >
+                    SFAS Training Plan
+                  </h1>
+                  
+                  <p 
+                    class="text-lg"
+                    style="font-family: 'Archivo Narrow', sans-serif; font-size: 1.125rem; line-height: 1.7; color: #717182; margin: 0;"
+                  >
+                    8-week progressive training cycle designed to prepare candidates for Special Forces Assessment and Selection. 
+                    Focused on rucking endurance, work capacity, and mental resilience.
+                  </p>
+                </div>
+
+                <div style="height: 1px; background-color: var(--border);"></div>
+
+                <!-- Key Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  ${stats.map(stat => `
+                    <div class="text-center">
+                      <div style="width: 24px; height: 24px; margin: 0 auto 0.5rem;">${stat.icon}</div>
+                      <div 
+                        class="uppercase tracking-wider mb-1"
+                        style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.75rem; letter-spacing: 0.1em; color: #717182; margin-bottom: 0.25rem;"
+                      >
+                        ${stat.label}
+                      </div>
+                      <div 
+                        style="font-family: 'Archivo Narrow', sans-serif; font-size: 1rem; font-weight: 600;"
+                      >
+                        ${stat.value}
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+
+                <div style="height: 1px; background-color: var(--border);"></div>
+
+                <!-- Program Description -->
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                  <h2 
+                    class="uppercase tracking-wider"
+                    style="font-family: 'Archivo Narrow', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: 0.1em; margin: 0;"
+                  >
+                    Program Overview
+                  </h2>
+                  
+                  <div style="display: flex; flex-direction: column; gap: 1rem; font-family: 'Archivo Narrow', sans-serif; font-size: 1rem; line-height: 1.8;">
+                    <p style="margin: 0;">
+                      This 8-week training plan is designed specifically for soldiers preparing for SFAS. The programming 
+                      emphasizes progressive overload in weighted ruck marching, sustained work capacity, and the mental 
+                      toughness required for selection-level events.
+                    </p>
+                    
+                    <p style="margin: 0;">
+                      Each week builds upon the previous, systematically increasing load, duration, and complexity. 
+                      You'll develop the endurance, strength, and resilience needed to perform under fatigue—a critical 
+                      component of selection success.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- What's Included -->
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                  <h2 
+                    class="uppercase tracking-wider"
+                    style="font-family: 'Archivo Narrow', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: 0.1em; margin: 0;"
+                  >
+                    What's Included
+                  </h2>
+                  
+                  <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem;">
+                    ${included.map(item => `
+                      <li class="flex gap-3">
+                        <div style="width: 20px; height: 20px; margin-top: 0.125rem; flex-shrink: 0;">${icons.check}</div>
+                        <span style="font-family: 'Archivo Narrow', sans-serif; font-size: 1rem; line-height: 1.6;">
+                          ${item}
+                        </span>
+                      </li>
+                    `).join('')}
+                  </ul>
+                </div>
+
+                <!-- Prerequisites -->
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                  <h2 
+                    class="uppercase tracking-wider"
+                    style="font-family: 'Archivo Narrow', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: 0.1em; margin: 0;"
+                  >
+                    Prerequisites
+                  </h2>
+                  
+                  <div style="display: flex; flex-direction: column; gap: 1rem; font-family: 'Archivo Narrow', sans-serif; font-size: 1rem; line-height: 1.8;">
+                    <p style="margin: 0;">
+                      This is an advanced training program. Before starting, you should be able to:
+                    </p>
+                    <ul style="margin-left: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                      <li>Complete a 5-mile ruck at 45lbs in under 75 minutes</li>
+                      <li>Perform 20+ strict pull-ups</li>
+                      <li>Run 5 miles in under 40 minutes</li>
+                      <li>Train 6 days per week consistently</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sidebar - Purchase Card -->
+              <div class="lg:col-span-1">
+                <div class="sticky border p-8" style="top: 6rem; border: 1px solid rgba(0, 0, 0, 0.2); display: flex; flex-direction: column; gap: 1.5rem;">
+                  <div>
+                    <div 
+                      class="mb-2"
+                      style="font-family: 'Archivo Narrow', sans-serif; font-size: 3rem; font-weight: 600; line-height: 1; margin-bottom: 0.5rem;"
+                    >
+                      $79
+                    </div>
+                    <div 
+                      style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; color: #717182;"
+                    >
+                      One-time purchase • Lifetime access
+                    </div>
+                  </div>
+
+                  <button 
+                    class="w-full bg-black text-white hover:bg-opacity-90 py-6 uppercase tracking-wider transition-all"
+                    style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; letter-spacing: 0.1em; border: none; cursor: pointer; border-radius: 0.375rem; width: 100%; padding: 1.5rem;"
+                  >
+                    Purchase Training Plan
+                  </button>
+
+                  <div style="height: 1px; background-color: var(--border);"></div>
+
+                  <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div 
+                      class="uppercase tracking-wider mb-4"
+                      style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.1em; margin-bottom: 1rem;"
+                    >
+                      This Plan Includes
+                    </div>
+                    ${planIncludes.map(item => `
+                      <div class="flex gap-3 items-start">
+                        <div style="width: 16px; height: 16px; margin-top: 0.25rem; flex-shrink: 0;">${icons.check}</div>
+                        <span style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.9rem;">
+                          ${item}
+                        </span>
+                      </div>
+                    `).join('')}
+                  </div>
+
+                  <div style="height: 1px; background-color: var(--border);"></div>
+
+                  <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <button 
+                      class="w-full text-center py-2 transition-opacity hover:opacity-60"
+                      style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; background: none; border: none; cursor: pointer; width: 100%;"
+                    >
+                      View Sample Week
+                    </button>
+                    <button 
+                      class="w-full text-center py-2 transition-opacity hover:opacity-60"
+                      style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; background: none; border: none; cursor: pointer; width: 100%;"
+                    >
+                      Contact Us
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Related Programs -->
+            <div class="mt-20">
+              <div style="height: 1px; background-color: var(--border); margin-bottom: 3rem;"></div>
+              <h2 
+                class="text-center mb-12 uppercase tracking-wider"
+                style="font-family: 'Archivo Narrow', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: 0.15em; text-align: center; margin-bottom: 3rem;"
+              >
+                Related Programs
+              </h2>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                ${["Ranger School Prep", "RASP Training Plan", "SOF Work Capacity"].map(title => `
+                  <div class="border p-6 hover:border-opacity-30 transition-all cursor-pointer" style="border: 1px solid rgba(0, 0, 0, 0.1); padding: 1.5rem;">
+                    <h3 
+                      class="mb-2"
+                      style="font-family: 'Archivo Narrow', sans-serif; font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;"
+                    >
+                      ${title}
+                    </h3>
+                    <div 
+                      style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; color: #717182;"
+                    >
+                      8 Weeks • Advanced
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ProductsGridPage Component (simplified for HTML)
+    function ProductsGridPage() {
+      const products = [
+        { title: "SFAS Training Plan", category: "Military & LE", duration: "8 Weeks", level: "Advanced", price: 79, image: "https://images.unsplash.com/photo-1578816693124-42a829c6ad1f?w=400" },
+        { title: "Ranger School Prep", category: "Military & LE", duration: "10 Weeks", level: "Advanced", price: 89, image: "https://images.unsplash.com/photo-1578816693124-42a829c6ad1f?w=400" },
+        { title: "LE Academy Prep", category: "Military & LE", duration: "6 Weeks", level: "Intermediate", price: 69, image: "https://images.unsplash.com/photo-1578816693124-42a829c6ad1f?w=400" },
+        { title: "14er Training Program", category: "Mountain", duration: "8 Weeks", level: "Intermediate", price: 75, image: "https://images.unsplash.com/photo-1647899512527-4b7dd66f2b9a?w=400" },
+        { title: "Alpine Climbing Prep", category: "Mountain", duration: "12 Weeks", level: "Advanced", price: 95, image: "https://images.unsplash.com/photo-1647899512527-4b7dd66f2b9a?w=400" },
+        { title: "Backcountry Ski Season", category: "Mountain", duration: "10 Weeks", level: "Intermediate", price: 85, image: "https://images.unsplash.com/photo-1647899512527-4b7dd66f2b9a?w=400" },
+        { title: "Wildland Fire Season Prep", category: "Wildland Fire", duration: "8 Weeks", level: "Advanced", price: 79, image: "https://images.unsplash.com/photo-1729217844863-cb4a17f7f2a3?w=400" },
+        { title: "Pack Test Training", category: "Wildland Fire", duration: "4 Weeks", level: "Intermediate", price: 59, image: "https://images.unsplash.com/photo-1729217844863-cb4a17f7f2a3?w=400" },
+        { title: "Hotshot Crew Fitness", category: "Wildland Fire", duration: "12 Weeks", level: "Advanced", price: 89, image: "https://images.unsplash.com/photo-1729217844863-cb4a17f7f2a3?w=400" }
+      ];
+
+      return `
+        <div class="min-h-screen py-24">
+          <div class="max-w-7xl mx-auto px-6">
+            <!-- Header -->
+            <div class="mb-12" style="margin-bottom: 3rem; display: flex; flex-direction: column; gap: 1rem;">
+              <h1 
+                style="font-family: 'Archivo Narrow', sans-serif; font-size: clamp(2rem, 4vw, 2.5rem); font-weight: 600; line-height: 1.2; margin: 0;"
+              >
+                Training Programs
+              </h1>
+              <p 
+                class="max-w-2xl"
+                style="font-family: 'Archivo Narrow', sans-serif; font-size: 1.125rem; line-height: 1.7; color: #717182; max-width: 42rem; margin: 0;"
+              >
+                Mission-specific training plans built for mountain and tactical athletes. 
+                Each program is designed with precision for your objective.
+              </p>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem 2rem; row-gap: 3rem;">
+              ${products.map(product => `
+                <div class="group cursor-pointer">
+                  <div class="relative overflow-hidden mb-4 bg-black" style="aspect-ratio: 3/4; margin-bottom: 1rem; border: 1px solid rgba(0, 0, 0, 0.1);">
+                    <img
+                      src="${product.image}"
+                      alt="${product.title}"
+                      class="w-full h-full object-cover transition-opacity duration-300"
+                      style="filter: grayscale(100%); opacity: 0.8; width: 100%; height: 100%; object-fit: cover;"
+                      onmouseover="this.style.opacity='0.6'"
+                      onmouseout="this.style.opacity='0.8'"
+                    />
+                    <div class="absolute" style="position: absolute; top: 1rem; left: 1rem;">
+                      <span class="inline-flex items-center justify-center rounded-md border px-2 py-0.5 uppercase tracking-wider" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.75rem; letter-spacing: 0.05em; background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(4px);">
+                        ${product.level}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div class="flex items-start justify-between gap-2">
+                      <h3 
+                        class="flex-1"
+                        style="font-family: 'Archivo Narrow', sans-serif; font-size: 1.125rem; font-weight: 600; line-height: 1.3; flex: 1; margin: 0;"
+                      >
+                        ${product.title}
+                      </h3>
+                      <div 
+                        style="font-family: 'Archivo Narrow', sans-serif; font-size: 1.125rem; font-weight: 600;"
+                      >
+                        $${product.price}
+                      </div>
+                    </div>
+                    
+                    <div 
+                      class="flex items-center gap-3"
+                      style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; color: #717182; display: flex; gap: 0.75rem;"
+                    >
+                      <span>${product.duration}</span>
+                      <span>•</span>
+                      <span>${product.category}</span>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // BlogPage Component
+    function BlogPage() {
+      const articles = [
+        {
+          title: "Training Philosophy: Why We Don't Chase PRs",
+          excerpt: "Understanding the fundamental difference between fitness for sport and fitness for mission. How our programming prioritizes operational readiness over gym performance.",
+          category: "Philosophy",
+          date: "October 28, 2025",
+          readTime: "8 min read",
+          image: "https://images.unsplash.com/photo-1510134659073-54f147c0afc2?w=600",
+          featured: true
+        },
+        {
+          title: "Rucking 101: Building Load-Bearing Endurance",
+          excerpt: "A comprehensive guide to progressive ruck training, from your first weighted march to preparing for selection-level distances.",
+          category: "Training",
+          date: "October 25, 2025",
+          readTime: "12 min read",
+          image: "https://images.unsplash.com/photo-1578816693124-42a829c6ad1f?w=600"
+        },
+        {
+          title: "Mental Resilience Under Fatigue: Selection Mindset",
+          excerpt: "How to train your mind when your body is exhausted. Practical strategies for building mental toughness in training and assessment.",
+          category: "Mental Training",
+          date: "October 22, 2025",
+          readTime: "10 min read",
+          image: "https://images.unsplash.com/photo-1647899512527-4b7dd66f2b9a?w=600"
+        },
+        {
+          title: "Altitude Training for Mountain Objectives",
+          excerpt: "Physiological adaptations and training protocols for high-altitude performance. What works, what doesn't, and how to prepare at sea level.",
+          category: "Mountain",
+          date: "October 18, 2025",
+          readTime: "9 min read",
+          image: "https://images.unsplash.com/photo-1761416489103-1a4590f77cd5?w=600"
+        },
+        {
+          title: "Work Capacity vs. Strength: What Tactical Athletes Need",
+          excerpt: "Understanding the balance between raw strength and sustainable work capacity for operational environments.",
+          category: "Training",
+          date: "October 15, 2025",
+          readTime: "7 min read",
+          image: "https://images.unsplash.com/photo-1729217844863-cb4a17f7f2a3?w=600"
+        }
+      ];
+
+      const categories = ["All Articles", "Philosophy", "Training", "Mental Training", "Mountain", "Recovery"];
+
+      return `
+        <div class="min-h-screen py-24">
+          <div class="max-w-7xl mx-auto px-6">
+            <!-- Header -->
+            <div class="mb-16 max-w-3xl">
+              <h1 
+                class="mb-4"
+                style="font-family: 'Archivo Narrow', sans-serif; font-size: clamp(2rem, 4vw, 2.5rem); font-weight: 600; line-height: 1.2; margin-bottom: 1rem;"
+              >
+                MTI Research & Articles
+              </h1>
+              <p 
+                style="font-family: 'Archivo Narrow', sans-serif; font-size: 1.125rem; line-height: 1.7; color: #717182; margin: 0;"
+              >
+                Training philosophy, research, and practical guidance for mountain and tactical athletes.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-12">
+              <!-- Main Content -->
+              <div class="lg:col-span-3">
+                <!-- Featured Article -->
+                <div class="group cursor-pointer grid md:grid-cols-2 gap-8 mb-16" style="margin-bottom: 4rem;">
+                  <div class="relative overflow-hidden bg-black" style="aspect-ratio: 4/3; border: 1px solid rgba(0, 0, 0, 0.1);">
+                    <img
+                      src="${articles[0].image}"
+                      alt="${articles[0].title}"
+                      class="w-full h-full object-cover transition-opacity duration-300"
+                      style="filter: grayscale(100%); opacity: 0.8; width: 100%; height: 100%; object-fit: cover;"
+                      onmouseover="this.style.opacity='0.6'"
+                      onmouseout="this.style.opacity='0.8'"
+                    />
+                  </div>
+                  <div class="flex flex-col justify-center" style="display: flex; flex-direction: column; justify-content: center; gap: 1rem;">
+                    <div class="uppercase tracking-wider" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.75rem; letter-spacing: 0.1em; color: #717182;">
+                      ${articles[0].category} • Featured
+                    </div>
+                    <h2 
+                      style="font-family: 'Archivo Narrow', sans-serif; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 600; line-height: 1.3; margin: 0;"
+                    >
+                      ${articles[0].title}
+                    </h2>
+                    <p style="font-family: 'Archivo Narrow', sans-serif; font-size: 1rem; line-height: 1.7; color: #717182; margin: 0;">
+                      ${articles[0].excerpt}
+                    </p>
+                    <div class="flex items-center gap-4" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; color: #717182; display: flex; gap: 1rem; padding-top: 0.5rem;">
+                      <div class="flex items-center gap-2">
+                        <div style="width: 16px; height: 16px;">${icons.calendar}</div>
+                        <span>${articles[0].date}</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <div style="width: 16px; height: 16px;">${icons.clock}</div>
+                        <span>${articles[0].readTime}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="height: 1px; background-color: var(--border); margin-bottom: 3rem;"></div>
+
+                <!-- Article Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem 2rem; row-gap: 3rem;">
+                  ${articles.slice(1).map(article => `
+                    <div class="group cursor-pointer">
+                      <div class="relative overflow-hidden mb-4 bg-black" style="aspect-ratio: 4/3; margin-bottom: 1rem; border: 1px solid rgba(0, 0, 0, 0.1);">
+                        <img
+                          src="${article.image}"
+                          alt="${article.title}"
+                          class="w-full h-full object-cover transition-opacity duration-300"
+                          style="filter: grayscale(100%); opacity: 0.8; width: 100%; height: 100%; object-fit: cover;"
+                          onmouseover="this.style.opacity='0.6'"
+                          onmouseout="this.style.opacity='0.8'"
+                        />
+                      </div>
+                      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <div class="uppercase tracking-wider" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.75rem; letter-spacing: 0.1em; color: #717182;">
+                          ${article.category}
+                        </div>
+                        <h3 
+                          style="font-family: 'Archivo Narrow', sans-serif; font-size: 1.25rem; font-weight: 600; line-height: 1.3; margin: 0;"
+                        >
+                          ${article.title}
+                        </h3>
+                        <p style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.95rem; line-height: 1.6; color: #717182; margin: 0;">
+                          ${article.excerpt}
+                        </p>
+                        <div class="flex items-center gap-4" style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; color: #717182; display: flex; gap: 1rem; padding-top: 0.25rem;">
+                          <div class="flex items-center gap-2">
+                            <div style="width: 16px; height: 16px;">${icons.calendar}</div>
+                            <span>${article.date}</span>
+                          </div>
+                          <div class="flex items-center gap-2">
+                            <div style="width: 16px; height: 16px;">${icons.clock}</div>
+                            <span>${article.readTime}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+
+              <!-- Sidebar -->
+              <div class="lg:col-span-1">
+                <div class="sticky" style="top: 6rem; display: flex; flex-direction: column; gap: 2rem;">
+                  <!-- Categories -->
+                  <div>
+                    <h3 
+                      class="uppercase tracking-wider mb-4"
+                      style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.1em; margin-bottom: 1rem;"
+                    >
+                      Categories
+                    </h3>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;">
+                      ${categories.map(category => `
+                        <li>
+                          <button 
+                            class="w-full text-left py-2 transition-opacity hover:opacity-60"
+                            style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.95rem; width: 100%; text-align: left; padding: 0.5rem 0; background: none; border: none; cursor: pointer; color: inherit;"
+                          >
+                            ${category}
+                          </button>
+                        </li>
+                      `).join('')}
+                    </ul>
+                  </div>
+
+                  <div style="height: 1px; background-color: var(--border);"></div>
+
+                  <!-- Newsletter -->
+                  <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <h3 
+                      class="uppercase tracking-wider"
+                      style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.1em; margin: 0;"
+                    >
+                      Newsletter
+                    </h3>
+                    <p style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.9rem; line-height: 1.6; color: #717182; margin: 0;">
+                      Get weekly training insights and new program releases.
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                      <input 
+                        type="email"
+                        placeholder="Your email"
+                        style="font-family: 'Archivo Narrow', sans-serif; border: 1px solid rgba(0, 0, 0, 0.2); padding: 0.5rem 0.75rem; border-radius: 0.375rem; outline: none; background-color: var(--input-background);"
+                      />
+                      <button 
+                        class="w-full bg-black text-white hover:bg-opacity-90 uppercase tracking-wider transition-all"
+                        style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; letter-spacing: 0.1em; border: none; cursor: pointer; border-radius: 0.375rem; padding: 0.5rem 1rem; width: 100%;"
+                      >
+                        Subscribe
+                      </button>
+                    </div>
+                  </div>
+
+                  <div style="height: 1px; background-color: var(--border);"></div>
+
+                  <!-- Popular Articles -->
+                  <div>
+                    <h3 
+                      class="uppercase tracking-wider mb-4"
+                      style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.1em; margin-bottom: 1rem;"
+                    >
+                      Popular Articles
+                    </h3>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1rem;">
+                      ${articles.slice(0, 3).map(article => `
+                        <li class="group cursor-pointer">
+                          <div 
+                            class="group-hover:opacity-60 transition-opacity"
+                            style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.95rem; line-height: 1.4; font-weight: 500;"
+                          >
+                            ${article.title}
+                          </div>
+                          <div 
+                            class="mt-1"
+                            style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.75rem; color: #717182; margin-top: 0.25rem;"
+                          >
+                            ${article.readTime}
+                          </div>
+                        </li>
+                      `).join('')}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Page Navigator
+    function PageNavigator() {
+      const pages = [
+        { key: 'home', label: 'Home' },
+        { key: 'products', label: 'Products Grid' },
+        { key: 'product', label: 'Product Page' },
+        { key: 'blog', label: 'Blog' }
+      ];
+
+      return `
+        <div class="fixed z-50" style="bottom: 1.5rem; left: 50%; transform: translateX(-50%); background-color: rgba(0, 0, 0, 0.9); backdrop-filter: blur(4px); padding: 0.75rem 1.5rem; border-radius: 9999px; border: 1px solid rgba(255, 255, 255, 0.1);">
+          <div class="flex gap-3">
+            ${pages.map(page => `
+              <button
+                onclick="setPage('${page.key}')"
+                id="nav-${page.key}"
+                class="uppercase tracking-wider transition-all"
+                style="font-family: 'Archivo Narrow', sans-serif; font-size: 0.75rem; letter-spacing: 0.1em; padding: 0.375rem 0.75rem; border: none; cursor: pointer; border-radius: 0.375rem; ${currentPage === page.key ? 'background-color: white; color: black;' : 'background-color: transparent; color: white;'}"
+              >
+                ${page.label}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // Main render function
+    function render() {
+      const pages = {
+        home: HomePage(),
+        products: ProductsGridPage(),
+        product: ProductPage(),
+        blog: BlogPage()
+      };
+
+      document.getElementById('app').innerHTML = `
+        ${Header()}
+        ${PageNavigator()}
+        <main class="pt-16" style="padding-top: 4rem;">
+          ${pages[currentPage]}
+        </main>
+        ${Footer()}
+      `;
+
+      // Update navigator buttons
+      ['home', 'products', 'product', 'blog'].forEach(page => {
+        const btn = document.getElementById(`nav-${page}`);
+        if (btn) {
+          if (page === currentPage) {
+            btn.style.backgroundColor = 'white';
+            btn.style.color = 'black';
+          } else {
+            btn.style.backgroundColor = 'transparent';
+            btn.style.color = 'white';
+          }
+        }
+      });
+    }
+
+    // Set page function
+    window.setPage = function(page) {
+      currentPage = page;
+      render();
+      window.scrollTo(0, 0);
+    };
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>
